@@ -1,0 +1,19 @@
+
+# Environments
+.env
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+.idea/
+
+# python cache
+__pycache__/
+*.pyc
+
+# excluding other files inside config folder
+config/config.ini
+
+# lib files
+lib
