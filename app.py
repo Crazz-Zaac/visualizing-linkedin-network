@@ -4,12 +4,12 @@ import seaborn as sns
 import os, sys, datetime, math
 from io import StringIO
 import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import networkx as nx
 
 from settings import DATASET_DIR, IMG_DIR
 from connection import ConnectionViz
+from timeline import TimeLineViz
+from follow import CompanyFollowViz
 
 
 st.header("Visualizing :blue[LinkedIn] Data")
@@ -18,49 +18,7 @@ def loadDataset(dir, filename):
     data_frame = pd.read_csv(dir+filename)
     return data_frame
 
-def bubbleChartViz(data_frame):
-    
-    # Create subplots with shared x-axis
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Scatter Plot', 'Bar Chart'])
-    
-        # Scatter Plot
-    scatter_trace = go.Scatter(
-        x=data_frame['Week'],
-        y=data_frame['Data science: (Worldwide)'],
-        mode='markers',
-        marker=dict(size=3, color='#046ccc'),
-        name='Scatter Plot',
-    )
-    fig.add_trace(scatter_trace, row=1, col=1)
 
-    # Bar Chart
-    bar_trace = go.Bar(
-        x=data_frame['Week'],
-        y=data_frame['Data science: (Worldwide)'],
-        marker=dict(color='#45d4b4'),
-        name='Bar Chart',
-    )
-    fig.add_trace(bar_trace, row=2, col=1)
-
-    # Customize the layout
-    fig.update_layout(
-        height=600,
-        title='Combined Scatter Plot and Bar Chart for Data Science Worldwide',
-        xaxis_title='Week',
-        yaxis_title='Data Science Count',
-    )
-
-
-
-
-    # Customize the layout if needed
-    fig.update_layout(
-        xaxis_title='Week',
-        yaxis_title='Data Science Count',
-    )
-
-    # Display the figure
-    st.plotly_chart(fig)
 
 def main():
     st.sidebar.header("Select Options")
@@ -69,7 +27,7 @@ def main():
         'Make a choice',
         ('Explore Connection Data',
             'Visualize Data Science World-wide Trend',
-            'Explore Company Follows Data')
+            'Explore Company Following Data')
     )
     if option == 'Explore Connection Data':
         df = loadDataset(DATASET_DIR, 'Connections.csv')  
@@ -92,12 +50,12 @@ def main():
         count_company = st.sidebar.checkbox("Count data by companies")
         count_year = st.sidebar.checkbox("Connections by year and month")
         view_graph = st.sidebar.checkbox("View connection graph")
+        tree_map = st.sidebar.checkbox("View Tree Map")
         # view_connexon = st.sidebar.checkbox("Maximum people involved position")
         
         
         if view_data:
             cxn.viewData()
-
         
         if describe_data:
             cxn.describeData()
@@ -110,13 +68,25 @@ def main():
         
         if view_graph:
             cxn.viewGraph()
+        
+        if tree_map:
+            cxn.viewTreeMap()
     
-    elif option == 'Visualize Data Science World-wide Trend':
-        st.subheader('What is the trend of Data Science world wide?')
+    if option == 'Visualize Data Science World-wide Trend':
+        st.subheader('Data Science Trend')
         df = loadDataset(DATASET_DIR, 'multiTimeline.csv')
         df['Week'] = pd.to_datetime(df['Week'])
-        st.write(df.head())
-        bubbleChartViz(df)
+        tml = TimeLineViz(df)
+        st.write(df)
+        st.subheader('What is the trend of Data Science world wide?')
+        tml.chartViz()
+    
+    if option == 'Explore Company Following Data':
+        st.subheader("How many companies did I connect with yearly?")
+        d_frame = loadDataset(DATASET_DIR, 'Company Follows.csv')
+        flw = CompanyFollowViz(d_frame)
+        flw.compFollow()
+    
 
 
 if __name__ == '__main__':
