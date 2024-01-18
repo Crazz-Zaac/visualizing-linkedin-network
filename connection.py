@@ -166,4 +166,13 @@ class ConnectionViz:
             width=1000,
         )
         st.plotly_chart(fig)
-        
+    
+    def viewTreeMap(self):
+        import plotly.io as pio
+        df = filtered_df.copy()
+        df.dropna(inplace=True)
+
+        # Create a treemap using Plotly Express
+        fig = px.treemap(df, path=['First Name', 'Company', 'Position'], width=1200, height=1200)
+
+        st.plotly_chart(fig, use_container_width=True)
