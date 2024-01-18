@@ -169,7 +169,7 @@ class ConnectionViz:
     
     def viewTreeMap(self):
         import plotly.io as pio
-        df = filtered_df.copy()
+        df = self.data_frame.copy()
         df.dropna(inplace=True)
 
         # Create a treemap using Plotly Express
